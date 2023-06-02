@@ -271,23 +271,23 @@
                     </div>
                     <div class="card">
                         <h3>Price per room night </h3>
-                        <p id="flobnb-price">30</p>
+                        <p id="price-per-unit-consumption">30</p>
                     </div>
                     <div class="card">
-                        <h3>Total units of consumption</h3>
-                        <p id="consumptionNumber">-</p>
+                        <h3>Total units of consumption measured</h3>
+                        <p id="total-consumption-measured">-</p>
                     </div>
                     <div class="card">
                         <h3>Consumption amount USD</h3>
-                        <p id="consumptionCost">-</p>
+                        <p id="total-consumption-cost">-</p>
                     </div>
                     <div class="card">
                         <h3>Consumption valuation</h3>
-                        <p id="total-technology-provider-tokens">-</p>
+                        <p id="consumption-valuation">-</p>
                     </div>
                     <div class="card">
                         <h3>System Valuation</h3>
-                        <p id="total-technology-provider-tokens">-</p>
+                        <p id="system-valuation">-</p>
                     </div>
                 </div>
             </section>
@@ -869,429 +869,12 @@
 
     </script>
     <script id="onLoadStartUp">
-        function formatAmount(amount) {
-            return amount.toLocaleString(`en-IN`, {
-                style: "currency",
-                currency: "INR",
-            });
+
+        async function updateIdElement(elementId, value){
+            element = document.getElementById(elementId)
+            element.innerText = value
+
         }
-
-        function ascii_to_hex(str){
-            var arr1 = [];
-            for (var n = 0, l = str.length; n < l; n ++) {
-                var hex = Number(str.charCodeAt(n)).toString(16);
-                arr1.push(hex);
-            }
-            return arr1.join('');
-        }
-        
-        function range_check(lower_range, upper_range, value) {
-            if (lower_range == 0) {
-                var truth_value = value >= lower_range && value <= upper_range;
-            } else {
-                var truth_value = value > lower_range && value <= upper_range;
-            }
-            return truth_value;
-        }
-
-        function return_rangenumbers(i, schedule_keys, schedule) {
-            if (i == 0) {
-                rangenumber = 0;
-                next_rangenumber = parseFloat(schedule_keys[i]);
-                token_release_amount_per_rupee = schedule[schedule_keys[i]];
-            } else if (schedule_keys[i] != "beyond") {
-                rangenumber = parseFloat(schedule_keys[i - 1]);
-                next_rangenumber = parseFloat(schedule_keys[i]);
-                token_release_amount_per_rupee = schedule[schedule_keys[i]];
-            } else {
-                rangenumber = parseFloat(schedule_keys[i - 1]);
-                next_rangenumber = Infinity;
-                token_release_amount_per_rupee = schedule[schedule_keys[i]];
-            }
-
-            return [rangenumber, next_rangenumber, token_release_amount_per_rupee];
-        }
-
-        function find_range_details(current_amount, tentative_amount) {
-            schedule = floGlobals.appObjects["token_distribution_schedule1"];
-            lowernumber = current_amount;
-            uppernumber = tentative_amount;
-            range_detail_list = new Array();
-            schedule_keys = Object.keys(schedule);
-            temp_lower = 0;
-            for (let i = 0; i < schedule_keys.length; i++) {
-                // Find the starting point
-                var [rangenumber, next_rangenumber] = return_rangenumbers(
-                    i,
-                    schedule_keys,
-                    schedule
-                );
-                var range_item = new Array();
-
-                if (temp_lower == 0) {
-                    if (lowernumber >= rangenumber && lowernumber <= next_rangenumber) {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(schedule[next_rangenumber]);
-                        range_item.push(next_rangenumber - lowernumber);
-                        range_detail_list.push(range_item);
-                        temp_lower = 1;
-                    }
-                } else if (temp_lower == 1) {
-                    //either full
-                    if (lowernumber < rangenumber && uppernumber >= next_rangenumber) {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(schedule[next_rangenumber]);
-                        range_item.push(next_rangenumber - rangenumber);
-                        range_detail_list.push(range_item);
-                    }
-                    // or partial overflow
-                    else if (
-                        uppernumber > rangenumber &&
-                        uppernumber < next_rangenumber
-                    ) {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(schedule[next_rangenumber]);
-                        range_item.push(uppernumber - rangenumber);
-                        range_detail_list.push(range_item);
-                    }
-                }
-            }
-
-            return range_detail_list;
-        }
-
-        function find_range_details1(current_amount, tentative_amount) {
-            schedule = floGlobals.appObjects["flobnb_base"]["distribution"];
-            range_detail_list = new Array();
-            schedule_keys = Object.keys(schedule);
-            found_lowerrange = false;
-            current_amount_range = null;
-            tentative_amount_range = null;
-
-            for (let i = 0; i < schedule_keys.length; i++) {
-                // Find the starting point
-                var [rangenumber, next_rangenumber, token_release_amount_per_rupee] = return_rangenumbers(i, schedule_keys, schedule);
-                //console.log(`${rangenumber}-${next_rangenumber}           ${token_release_amount_per_rupee}`)
-                var range_item = new Array();
-                // check if current amount falls in the range
-                if (
-                    !found_lowerrange &&
-                    range_check(rangenumber, next_rangenumber, current_amount)
-                ) {
-                    if (range_check(rangenumber, next_rangenumber, tentative_amount)) {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(token_release_amount_per_rupee);
-                        range_item.push(tentative_amount - current_amount);
-                        range_detail_list.push(range_item);
-                        break;
-                    } else {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(token_release_amount_per_rupee);
-                        range_item.push(next_rangenumber - current_amount);
-                        range_detail_list.push(range_item);
-                        found_lowerrange = true;
-                        continue;
-                    }
-                }
-
-                // check if tentative_amount falls in the range
-                if (found_lowerrange) {
-                    if (range_check(rangenumber, next_rangenumber, tentative_amount)) {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(token_release_amount_per_rupee);
-                        range_item.push(tentative_amount - rangenumber);
-                        range_detail_list.push(range_item);
-                        break;
-                    } else {
-                        range_item.push(`${rangenumber}-${next_rangenumber}`);
-                        range_item.push(token_release_amount_per_rupee);
-                        range_item.push(next_rangenumber - rangenumber);
-                        range_detail_list.push(range_item);
-                    }
-                }
-            }
-
-            return range_detail_list;
-        }
-
-        function findCurrentAmount() {
-            let cur_amt = 0;
-            let fk = floCloudAPI.util.filterKey("flobnb_data", {});
-            for (let d in floGlobals.generalData[fk])
-                cur_amt += floGlobals.generalData[fk][d].message.consumer_amount;
-            return cur_amt;
-        }
-
-        function find_balances_txs_floid(floID) {
-            let floid_balances = {
-                consumer_amt: 0,
-                referrer_amt: 0
-            };
-
-            let floid_transactions = {};
-
-            let fk = floCloudAPI.util.filterKey("flobnb_data", {});
-            for (let d in floGlobals.generalData[fk]) {
-                if (floGlobals.generalData[fk][d].message.consumer_floid == floID) {
-                    floid_balances["consumer_amt"] +=
-                        floGlobals.generalData[fk][d].message.consumer_split;
-                    floid_transactions[d] = floGlobals.generalData[fk][d].message
-                }
-
-                if (floGlobals.generalData[fk][d].message.referrer_floid == floID) {
-                    floid_balances["referrer_amt"] +=
-                        floGlobals.generalData[fk][d].message.referrer_split;
-                    floid_transactions[d] = floGlobals.generalData[fk][d].message
-                }
-            }
-            return [floid_balances, floid_transactions];
-        }
-
-        function processData(data) {
-            return new Promise((resolve, reject) => {
-                if (!floGlobals.subAdmins.includes(myFloID))
-                    return reject("Access denied");
-                // calculations based on the consumer amount
-                let current_amount = findCurrentAmount();
-                let tentative_amount =
-                    current_amount + parseFloat(data.consumer_amount);
-                let range_details = find_range_details1(
-                    current_amount,
-                    tentative_amount
-                );
-                let flobnb_tokens_tobereleased = 0;
-                range_details.forEach((element) => {
-                    flobnb_tokens_tobereleased += element[2] * element[1];
-                });
-                // split the tokens
-                if (data.referrer_floid == "")
-                    split_info =
-                        floGlobals.appObjects.flobnb_base.splits.without_referrer;
-                else
-                    split_info = floGlobals.appObjects.flobnb_base.splits.with_referrer;
-                data.consumer_split =
-                    split_info.consumer * flobnb_tokens_tobereleased;
-                data.producer_split =
-                    split_info.producer * flobnb_tokens_tobereleased;
-                data.investor_split =
-                    split_info.investor * flobnb_tokens_tobereleased;
-                data.referrer_split =
-                    split_info.referrer * flobnb_tokens_tobereleased;
-                data.technology_provider_split =
-                    split_info.technology_provider * flobnb_tokens_tobereleased;
-                let rmtID = floGlobals.appObjects["flobnb_base"]["rmt_ownerID"];
-
-                let receivers = {};
-                receivers[rmtID] = data.technology_provider_split;
-                receivers[data.property_floid] =
-                    (receivers[data.property_floid] || 0) + data.producer_split;
-                receivers[data.consumer_floid] =
-                    (receivers[data.consumer_floid] || 0) + data.consumer_split;
-                receivers[data.investor_floid] =
-                    (receivers[data.investor_floid] || 0) + data.investor_split;
-
-                if (data.referrer_split)
-                    receivers[data.referrer_floid] =
-                        (receivers[data.referrer_floid] || 0) + data.referrer_split;
-                floExchangeAPI
-                    .transferToken(receivers, "flobnb", myFloID, myPrivKey)
-                    .then((txid) => {
-                        let sensitiveData = {
-                            consumer_name: data.consumer_name,
-                            consumer_upi_address: data.consumer_upi_address,
-                            consumer_email: data.consumer_email,
-                            referrer_name: data.referrer_name,
-                        };
-
-                        let cloudData = {
-                            privacy_data: floCrypto.encryptData(
-                                JSON.stringify(sensitiveData),
-                                floGlobals.appObjects["flobnb_base"]["encrypt_key"]
-                            ),
-
-                            consumer_floid: data.consumer_floid,
-                            consumer_amount: data.consumer_amount,
-                            consumer_split: data.consumer_split,
-
-                            investor_floid: data.investor_floid,
-                            investor_split: data.investor_split,
-
-                            property_floid: data.property_floid,
-                            producer_split: data.producer_split,
-
-                            referrer_floid: data.referrer_floid,
-                            referrer_split: data.referrer_split,
-
-                            technology_provider_split: data.technology_provider_split,
-                            flobnb_distributed: flobnb_tokens_tobereleased,
-                            txid: txid,
-
-                            from_date: data.from_date,
-                            to_date: data.to_date,
-                            days_stayed: data.days_stayed,
-                        };
-                        floCloudAPI
-                            .sendGeneralData(cloudData, "flobnb_data")
-                            .then((result) => resolve(result))
-                            .catch((error) => reject(error));
-                    })
-                    .catch((error) => reject(error));
-            });
-        }
-
-        function submit_customer_form() {
-            console.log("clicked");
-            document.getElementById('subadmin-form-submit-button').disabled = true;
-
-            data = {
-                consumer_floid: document.getElementById("subadmin-form-floID").value,
-                consumer_name: document.getElementById("subadmin-form-name").value,
-                consumer_upi_address: document.getElementById("subadmin-form-upiID").value,
-                consumer_email: document.getElementById("subadmin-form-email").value,
-                consumer_amount: parseFloat(document.getElementById("subadmin-form-amount").value),
-                investor_floid: document.getElementById("subadmin-form-investorFLOID").value,
-                property_floid: document.getElementById("subadmin-form-propertyFLOID").value,
-                days_stayed: document.getElementById("subadmin-form-numberOfDays").value,
-                referrer_floid: document.getElementById("subadmin-form-referrerFLOID").value,
-                referrer_name: document.getElementById("subadmin-form-referrerName").value,
-                from_date: document.getElementById("subadmin-form-fromDate").value,
-                to_date: document.getElementById("subadmin-form-toDate").value,
-            };
-
-            processData(data)
-                .then((result) => {
-                    console.log(result);
-                    document.getElementById("subadmin-form").reset();
-                    document.getElementById('subadmin-form-submit-button').disabled = false;
-                })
-                .catch((error) => {
-                    console.error(error);
-                    alert(error);
-                });
-        }
-        
-        function find_unregistered_floids(mining_user_data){
-            var unregistered_floids = [];
-            var registered_floids = Object.keys(floGlobals.appObjects.mining_base.miners);
-            for (var i = 0; i < mining_user_data.length; i++) {
-                if (!registered_floids.includes(mining_user_data[i].coin_address)) {
-                    unregistered_floids.push(mining_user_data[i])
-                }
-            }
-            return unregistered_floids
-        }
-
-        async function find_user_diff_shares(id){
-            const user_shares_details = await fetch(`https://miningapitest.duckdns.org/getUserShares?id={id}`)
-            return await user_shares_details.json()
-        }
-        
-        function render_miner_status(api_miner_data){
-            floGlobals.minersData = api_miner_data;
-            const frag = document.createDocumentFragment();
-            for (const key in api_miner_data){
-                frag.append(render.minerStatusInfo(api_miner_data[key]))
-            }
-            document.getElementById("approve_new_users").append(frag);
-        }
-
-        document.getElementById('approve_new_users').addEventListener('change', e => {
-            const allow = e.target.value ? 1: 0; 
-            const floID = e.target.closest('.miner-status-entry').dataset.floId
-            const data = `${floID}${allow}`
-            const signature = floCrypto.signData(data, myPrivKey)
-            fetch(`https://miningapitest.duckdns.org/change?flo_id=${floID}&status=${allow}&signature=${signature}`, { method:"POST"})
-            .then((res) => {
-                console.log(res)
-            })
-            .catch(err => {
-                console.error(err)
-                e.target.value = !allow;
-            })
-        })
-
-        async function initialize_new_users(data){
-            await floCloudAPI.requestObjectData('mining_base')
-            present_users = Object.keys(floGlobals.appObjects.mining_base.miners)
-            Object.keys(data).forEach(function(key){
-                if(!present_users.includes(data[key]['FLO_ID'])){
-                    let { FLO_ID, account_id, pool_acceptance, shares, tokens, username} = data[key]
-                    // update user details 
-                    floGlobals.appObjects.mining_base['miners'][FLO_ID] = {
-                                                                    'account_id': account_id,
-                                                                    'shares':0, 
-                                                                    'tokens':0,
-                                                                    'username':username }
-                }
-            })
-            await floCloudAPI.updateObjectData("mining_base")
-        }
-
-
-        function release_tokens(){
-            getConfirmation('Release the tokens?').then(res => {
-                if(res){
-                    receivers = {}
-                    for(const key in floGlobals.minersData){
-                        const {tokens, FLO_ID, shares} = floGlobals.minersData[key]
-                        let tokens_to_release = tokens - floGlobals.appObjects.mining_base.miners[FLO_ID]['tokens']
-                        console.log(`User ${FLO_ID}`)
-                        console.log(`tokens to release : ${tokens_to_release}`)
-                        // code to release tokens on the RanchiMall Exchange 
-                        if (tokens_to_release != 0){
-                            receivers[FLO_ID] = tokens_to_release
-                        }
-                    }
-
-                    floExchangeAPI
-                        .transferToken(receivers, "mining", myFloID, myPrivKey)
-                        .then((txid) => {
-                            let sensitiveData = {
-                                consumer_name: data.consumer_name,
-                                consumer_upi_address: data.consumer_upi_address,
-                                consumer_email: data.consumer_email,
-                                referrer_name: data.referrer_name,
-                            };
-
-                            let cloudData = {
-                                privacy_data: floCrypto.encryptData(
-                                    JSON.stringify(sensitiveData),
-                                    floGlobals.appObjects["flobnb_base"]["encrypt_key"]
-                                ),
-
-                                consumer_floid: data.consumer_floid,
-                                consumer_amount: data.consumer_amount,
-                                consumer_split: data.consumer_split,
-
-                                investor_floid: data.investor_floid,
-                                investor_split: data.investor_split,
-
-                                property_floid: data.property_floid,
-                                producer_split: data.producer_split,
-
-                                referrer_floid: data.referrer_floid,
-                                referrer_split: data.referrer_split,
-
-                                technology_provider_split: data.technology_provider_split,
-                                flobnb_distributed: flobnb_tokens_tobereleased,
-                                txid: txid,
-
-                                from_date: data.from_date,
-                                to_date: data.to_date,
-                                days_stayed: data.days_stayed,
-                            };
-                            
-                            floCloudAPI
-                                .sendGeneralData(cloudData, "flobnb_data")
-                                .then((result) => resolve(result))
-                                .catch((error) => reject(error)); 
-                            
-                        })
-                        .catch((error) => reject(error)); 
-                }
-            })
-        }
-
 
         async function onLoadStartUp() {
             //floDapps.addStartUpFunction('Sample', Promised Function)
@@ -1319,34 +902,27 @@
                     document.getElementById('subadmin-nav').classList.remove('hide')
                 }
 
-                /*
-                getRef('user-tx-section').addEventListener('click', event => {
-                    if (event.target.closest(".transaction-card")) {
-                        const vectorclock = event.target.closest(".transaction-card").dataset.vectorclock
-                        console.log(vectorclock)
-                        console.log(event.target)
-                        fill_tx_popup(vectorclock)
-                        showPopup('tx_popup')
-                    }
-                })
-                */
-
+                
                 // Show userinfo 
                 document.getElementById('userinfo-nav').classList.remove('hide')
                 document.getElementById('userinfo-nav').click()
                 update_user_ui_data()
 
                 //App functions....
-                fetch('https://miningapitest.duckdns.org/getUsers')
+                fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data')
                     .then(response => response.json())
                     .then(data => {
-                        // Check if all the user data is present in the cloud object 
-                        console.log('user data')
-                        console.log(data)
-                        //let unregistered_floids = find_unregistered_floids(data['users'])
-                        initialize_new_users(data)
-                        // pass the api data to rendering function
-                        render_miner_status(data)
+                        p1 = updateIdElement("total-amount-issued", data["productionValuation"])
+                        p2 = updateIdElement("total-consumption-measured", data["consumptionNumber"])
+                        p3 = updateIdElement("total-consumption-cost", data["consumptionCost"])
+                        p5 = updateIdElement("consumption-valuation", data["consumptionValuation"])
+                        p6 = updateIdElement("system-valuation", data["systemValuation"])
+
+                        Promise.all([p1, p2, p3, p5, p6]).then((values) => {
+                            console.log("Updates latest values");
+                        });
+
+
                     })
                     .catch(error => console.error('Error:', error)) 
 
