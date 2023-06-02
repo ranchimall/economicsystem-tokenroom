@@ -272,8 +272,8 @@
         </nav>
         <article class="right language-html">
             <section id="dashboard" class="page">
-                <h1 class="page__title">Dashboard</h1>
-                <p>Details of overall tokens issued</p>
+                <h1 class="page__title">Tokenroom Economic system</h1>
+                <p>Details of various parts of Tokenroom's Economic system</p>
                 <div class="card-wrapper">
                     <div class="card">
                         <h3>Production valuation</h3>
@@ -514,30 +514,31 @@
 
             floDapps.launchStartUp().then((result) => {
                 console.log(result);
-                window.location.hash = '#userinfo';
-                getRef('user_flo_id').value = myFloID
-                getRef('user_login_popup_button').classList.add('hide')
-                getRef('userpage-userfloid').innerText = myFloID
-                getRef('user_signout_popup_button').classList.remove('hide')
+                //window.location.hash = '#userinfo';
+                // getRef('user_flo_id').value = myFloID
+                // getRef('user_login_popup_button').classList.add('hide')
+                // getRef('userpage-userfloid').innerText = myFloID
+                // getRef('user_signout_popup_button').classList.remove('hide')
 
                 // Check if subadmin 
                 if (floGlobals.subAdmins.includes(myFloID)) {
                     console.log('This is a subadmin')
                     document.getElementById('subadmin-nav').classList.remove('hide')
                 }
-
                 
                 // Show userinfo 
-                document.getElementById('userinfo-nav').classList.remove('hide')
-                document.getElementById('userinfo-nav').click()
+                //document.getElementById('userinfo-nav').classList.remove('hide')
+                //document.getElementById('userinfo-nav').click()
 
                 //App functions....
+                console.log('before fetch')
                 fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data',{
                     headers: {
                         'Access-Control-Allow-Origin': '*'
                     }})
                     .then(response => response.json())
                     .then(data => {
+                        console.log('after fetch')
                         p1 = updateIdElement("total-amount-issued", data["productionValuation"])
                         p2 = updateIdElement("total-consumption-measured", data["consumptionNumber"])
                         p3 = updateIdElement("total-consumption-cost", data["consumptionCost"])
