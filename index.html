@@ -9,6 +9,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Roboto+Mono&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <script id="floGlobals">
+        /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
+        const floGlobals = {
+            blockchain: "FLO",
+            adminID: "FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf",
+            application: "TEST_MODE",
+        }
+    </script>
+
 </head>
 
 <body data-theme="light" class="hide" onload="onLoadStartUp()">
@@ -406,41 +416,7 @@
 
     <script src="js/main_UI.js"></script>
     <script src="js/components.min.js"></script>
-    <script src="js/floExchangeAPI.js"></script>
-    <script src="js/floTokenAPI.js"></script>
-    <script id="floGlobals">
-        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
-        const floGlobals = {
-            //Required for all
-            blockchain: "FLO",
-
-            //Required for blockchain API operators
-            apiURL: {
-                FLO: ["https://livenet.flocha.in/", "https://flosight.duckdns.org/"],
-                FLO_TEST: [
-                    "https://testnet-flosight.duckdns.org/",
-                    "https://testnet.flocha.in/",
-                ],
-            },
-            adminID: "FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf",
-            sendAmt: 0.001,
-            fee: 0.0005,
-
-            //Required for Supernode operations
-            SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
-            supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
-
-            //for cloud apps
-            subAdmins: [],
-            application: "TEST_MODE",
-            appObjects: {},
-            generalData: {},
-            lastVC: {},
-
-            tokenURL: "https://ranchimallflo.duckdns.org/",
-            currency: "rupee",
-        };
-    </script>
+    <script src="https://ranchimall.github.io/Standard_Operations/floTokenAPI.js"></script>
 
     <script id='ui_utils'>
 
@@ -516,358 +492,7 @@
         ]
 
     </script>
-    <script>
-        const render = {
-            transactionCard({ userRole, details, vectorClock }) {
-                const clone = getRef(userRole == 'consumer' ? 'tx-card-1' : 'tx-card-2').content.cloneNode(true).firstElementChild;
-                clone.querySelector('.txcard-type').textContent = userRole;
-                clone.dataset.vectorclock = vectorClock;
-                const {
-                    consumer_amount,
-                    consumer_split,
-                    producer_split,
-                    investor_split,
-                    referrer_split,
-                    days_stayed,
-                    from_date,
-                    to_date
-                } = details;
 
-                clone.querySelector('.txcard-days-stayed').textContent = `${days_stayed} days stayed`;
-                clone.querySelector('.txcard-from-to-date').textContent = `From ${from_date} to ${to_date}`;
-
-                switch (userRole) {
-                    case 'consumer':
-                        clone.querySelector('.txcard-amount').textContent = `${formatAmount(consumer_amount)} spent`;
-                        clone.querySelector('.txcard-split').textContent = `${consumer_split} flobnb# tokens received`;
-                        break;
-                    case 'property':
-                        clone.querySelector('.txcard-split').textContent = `${producer_split} flobnb# tokens received`;
-                        break;
-                    case 'investor':
-                        clone.querySelector('.txcard-split').textContent = `${investor_split} flobnb# tokens received`;
-                        break;
-                    case 'referrer':
-                        clone.querySelector('.txcard-split').textContent = `${referrer_split} flobnb# tokens received`;
-                        break;
-                }
-                return clone
-            },
-
-            minerStatusInfo(miner_data) {
-                let {FLO_ID, pool_acceptance, shares, tokens} = miner_data
-                let {shares:old_shares, tokens:old_tokens} = floGlobals.appObjects.mining_base.miners[FLO_ID]
-                const clone = getRef('miner_status_entry').content.cloneNode(true).firstElementChild;
-                clone.dataset.floId = FLO_ID;
-                clone.querySelector('.miner-status-entry-floid').textContent = FLO_ID; 
-                clone.querySelector('.tokens-to-release').textContent = tokens - old_tokens; 
-                clone.querySelector('.old-tokens').textContent = old_tokens; 
-                clone.querySelector('.new-tokens').textContent = tokens; 
-                clone.querySelector('.old-shares').textContent = old_shares; 
-                clone.querySelector('.new-shares').textContent = shares; 
-                if(pool_acceptance) 
-                clone.querySelector('sm-switch').setAttribute('checked', '');
-                return clone;
-            }
-
-        }
-
-        function update_element(id, value) {
-            document.getElementById(id).textContent = value;
-        }
-
-        async function update_overview_ui_data() {
-            // overview
-            rates = await floExchangeAPI.getRates();
-            update_element(
-                "flobnb-price",
-                formatAmount(parseFloat(rates.rates['mining']))
-            );
-            update_element(
-                "flobnb-price-userpage",
-                formatAmount(parseFloat(rates.rates['mining']))
-            );
-            update_element(
-                "total-amount-issued",
-                formatAmount(parseFloat(localStorage.getItem("total_amount")))
-            );
-            update_element(
-                "total-tokens-issued",
-                `${localStorage.getItem("total_tokens")} mining#`
-            );
-            update_element(
-                "total-customer-tokens",
-                `${localStorage.getItem("consumer_split")} mining#`
-            );
-            update_element(
-                "total-technology-provider-tokens",
-                `${localStorage.getItem("technology_provider_split")} mining#`
-            );
-        }
-
-        function categorize_userrole_transaction(floid, transaction) {
-            if (transaction['consumer_floid'] == floid) {
-                return 'consumer';
-            }
-
-            if (transaction['investor_floid'] == floid) {
-                return 'investor';
-            }
-
-            if (transaction['property_floid'] == floid) {
-                return 'property';
-            }
-
-            if (transaction['referrer_floid'] == floid) {
-                return 'referrer';
-            }
-
-            if (transaction['technology_provider_floid'] == floid) {
-                return 'technology_provider';
-            }
-        }
-
-        function create_card(userrole, transaction, vectorclock) {
-            if (userrole == 'consumer') {
-                document.getElementById('user-tx-section').innerHTML = `<div class="transaction-card card" data-vectorclock="${vectorclock}">
-                        <h3>Consumer</h3>
-                        <p>
-                        <div>Rs spent : ${transaction.consumer_amount}</div>
-                        <div>Token amount : ${transaction.consumer_split}</div>
-                        <div>Days stayed : ${transaction.days_stayed}</div>
-                        <div>From ${transaction.from_date} to ${transaction.to_date}</div>
-                        </p>
-                    </div>` + document.getElementById('user-tx-section').innerHTML
-            }
-
-            if (userrole == 'property') {
-                document.getElementById('user-tx-section').innerHTML = `<div class="transaction-card card" data-vectorclock="${vectorclock}">
-                        <h3>Producer</h3>
-                        <p>
-                        <div>Token amount : ${transaction.producer_split}</div>
-                        <div>Days stayed : ${transaction.days_stayed}</div>
-                        <div>From ${transaction.from_date} to ${transaction.to_date}</div>
-                        </p>
-                    </div>` + document.getElementById('user-tx-section').innerHTML
-            }
-
-            if (userrole == 'investor') {
-                document.getElementById('user-tx-section').innerHTML = `<div class="transaction-card card" data-vectorclock="${vectorclock}">
-                        <h3>Investor</h3>
-                        <p>
-                        <div>Token amount : ${transaction.investor_split}</div>
-                        </p>
-                    </div>` + document.getElementById('user-tx-section').innerHTML
-            }
-
-            if (userrole == 'referrer') {
-                document.getElementById('user-tx-section').innerHTML = `<div class="transaction-card card" data-vectorclock="${vectorclock}">
-                        <h3>Referrer</h3>
-                        <p>
-                        <div>Token amount : ${transaction.referrer_split}</div>
-                        </p>
-                    </div>` + document.getElementById('user-tx-section').innerHTML
-            }
-
-        }
-
-
-        let transactionsLazyLoader
-        function render_user_transactions(transaction_dictionary) {
-            const frag = document.createDocumentFragment();
-            let arrayOfTransactions = []
-            for (let vectorClock in transaction_dictionary) {
-                // do something for each key in the object 
-                let userRole = categorize_userrole_transaction(myFloID, transaction_dictionary[vectorClock])
-                arrayOfTransactions.push({ userRole, details: transaction_dictionary[vectorClock], vectorClock })
-            }
-            transactionsLazyLoader = new LazyLoader('#user-tx-section', arrayOfTransactions, render.transactionCard)
-            transactionsLazyLoader.init()
-        }
-
-        function update_user_ui_data() {
-            // User Info
-            let promise1 = floExchangeAPI.getBalance(myFloID, "mining");
-            let promise2 = fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${myFloID}&token=mining`);
-            let promise3 = floExchangeAPI.getRates();
-
-            Promise.all([promise1, promise2, promise3]).then((results) => {
-                update_element("exchange-flobnb-balance", `${parseFloat(results[0].balance)} mining#`);
-                results[1].json().then((blockchain_data) => {
-                    if (blockchain_data["balance"] == null)
-                        blockchain_data["balance"] = 0;
-                    update_element("blockchain-flobnb-balance", `${parseFloat(blockchain_data["balance"])} mining#`);
-                    update_element("total-flobnb-balance", `${parseFloat(blockchain_data["balance"]) + parseFloat(results[0].balance)} mining#`);
-                    update_element("total-flobnb-valuation", formatAmount((parseFloat(blockchain_data["balance"]) + parseFloat(results[0].balance)) * parseFloat(results[2].rates.mining)));
-                });
-            });
-
-            // Token split Info
-            let [floid_balances, floid_transactions] = find_balances_txs_floid(myFloID);
-
-            //update_element("total-consumertoken-balance", floid_balances["consumer_amt"]);
-
-            //render_user_transactions(floid_transactions);
-        }
-
-        function load_overview_data() {
-            return new Promise((resolve, reject) => {
-                let promise1 = floCloudAPI.requestObjectData("flobnb_base", {
-                    callback: (d, e) => null,
-                });
-                let promise2 = floCloudAPI.requestGeneralData("flobnb_data", {
-                    senderID: floGlobals.subAdmins,
-                    callback: (d, e) => {
-                        console.log("CALLBACK");
-                        if (e) return;
-                        let consumer_split =
-                                parseFloat(localStorage.getItem("consumer_split")) || 0,
-                            technology_provider_split =
-                                parseFloat(localStorage.getItem("technology_provider_split")) || 0,
-                            total_amount =
-                                parseFloat(localStorage.getItem("total_amount")) || 0,
-                            total_tokens =
-                                parseFloat(localStorage.getItem("total_tokens")) || 0;
-
-                        for (let v in d) {
-                            consumer_split += d[v].message.consumer_split;
-                            technology_provider_split += d[v].message.technology_provider_split;
-                            total_amount += d[v].message.consumer_amount;
-                            total_tokens += d[v].message.consumer_split + d[v].message.producer_split + d[v].message.investor_split + d[v].message.referrer_split + d[v].message.technology_provider_split;
-                        }
-
-                        localStorage.setItem("consumer_split", consumer_split);
-                        localStorage.setItem("technology_provider_split", technology_provider_split);
-                        localStorage.setItem("total_amount", total_amount);
-                        localStorage.setItem("total_tokens", total_tokens);
-
-                        update_overview_ui_data();
-                    },
-                });
-
-                let promise3 = floCloudAPI.requestObjectData("mining_base")
-                Promise.all([promise1, promise2, promise3])
-                    .then((r) => resolve(r))
-                    .catch((e) => reject(e));
-            });
-        }
-
-        function fill_tx_popup(vectorclock) {
-
-            let key = floCloudAPI.util.filterKey("flobnb_data", {});
-            const {
-                consumer_floid,
-                consumer_amount,
-                consumer_split,
-                from_date,
-                to_date,
-                investor_floid,
-                investor_split,
-                property_floid,
-                producer_split,
-                referrer_floid,
-                referrer_split,
-                technology_provider_split,
-                txid
-            } = floGlobals.generalData[key][vectorclock]['message']
-
-            getRef('tx-popup-consumer-id').value = consumer_floid;
-            getRef('tx-popup-consumer-amount').value = consumer_amount;
-            getRef('tx-popup-consumer-tokens').value = consumer_split;
-            getRef('tx-popup-consumer-fromdate').value = from_date;
-            getRef('tx-popup-consumer-todate').value = to_date;
-            getRef('tx-popup-investor-id').value = investor_floid;
-            getRef('tx-popup-investor-tokens').value = investor_split;
-            getRef('tx-popup-property-id').value = property_floid;
-            getRef('tx-popup-producer-tokens').value = producer_split;
-            getRef('tx-popup-referrer-id').value = referrer_floid;
-            getRef('tx-popup-referrer-tokens').value = referrer_split;
-            getRef('tx-popup-technology-tokens').value = technology_provider_split;
-            getRef('tx-popup-txid').value = txid;
-
-        }
-
-        function generateCredentials() {
-            const animOptions = {
-                fill: 'forwards',
-                duration: 150,
-                ease: 'easing',
-            }
-            const { floID, privKey } = floCrypto.generateNewID()
-            getRef('generated_flo_id').value = floID
-            getRef('generated_private_key').value = privKey
-            getRef('sign_in').animate(slideOutLeft, animOptions).onfinish = () => {
-                getRef('sign_in').classList.add('hide')
-                getRef('sign_up').classList.remove('hide')
-                getRef('sign_up').animate(slideInLeft, animOptions)
-            }
-        }
-        function goToSignIn() {
-            const animOptions = {
-                fill: 'forwards',
-                duration: 150,
-                ease: 'easing',
-            }
-            getRef('sign_up').animate(slideOutRight, animOptions).onfinish = () => {
-                getRef('sign_in').classList.remove('hide')
-                getRef('sign_in').animate(slideInRight, animOptions)
-                getRef('sign_up').classList.add('hide')
-            }
-        }
-        function getSignedIn() {
-            return new Promise((resolve, reject) => {
-                getRef('sign_in_button').onclick = () => {
-                    resolve(getRef('private_key_field').value.trim())
-                    getRef('private_key_field').value = ''
-                    hidePopup()
-                    notify('Signed in', 'success')
-                }
-                getRef('sign_up_button').onclick = () => {
-                    getConfirmation('Sign in?', 'Make sure you have copied your private key.')
-                        .then((res) => {
-                            if (res) {
-                                resolve(getRef('generated_private_key').value.trim())
-                                getRef('generated_private_key').value = ''
-                                hidePopup()
-                                notify('Signed in', 'success')
-                            }
-                        })
-                }
-            })
-        }
-        async function signOut() {
-            getConfirmation('Sign out?', 'You are about to sign out of the app, continue?', 'Stay', 'Leave')
-                .then(async (res) => {
-                    if (res) {
-                        await floDapps.clearCredentials()
-                        location.reload()
-                    }
-                })
-        }
-
-        function clearLocalData(){
-            floDapps.deleteAppData(false).then(r => { 
-                localStorage.removeItem("consumer_split");
-                localStorage.removeItem("producer_split");
-                localStorage.removeItem("investor_split");
-                localStorage.removeItem("referrer_split");
-                localStorage.removeItem("technology_provider_split");
-                localStorage.removeItem("total_amount");
-                localStorage.removeItem("total_tokens");
-                location.reload();
-            })
-        }
-
-        async function confirmSubmitForm() {
-            getConfirmation('Confirm', 'Have you crossed checked & confirmed the data is right', "I'll re-check", 'Yes, I have')
-                .then(async (res) => {
-                    if (res) {
-                        submit_customer_form()
-                    }
-                })
-        }
-
-    </script>
     <script id="onLoadStartUp">
 
         async function updateIdElement(elementId, value){
@@ -882,9 +507,8 @@
             //floDapps.setCustomPrivKeyInput( () => { FUNCTION BODY *must resolve private key* } )
 
             //floDapps.setAppObjectStores({ images: {} })
-            floDapps.setCustomPrivKeyInput(getSignedIn)
-            floDapps.setMidStartup(load_overview_data)
-            await floExchangeAPI.init("FMxYC7gYZhouzqtHZukGnPiQ8nvG4CMzXM", "exchange")
+            //floDapps.setCustomPrivKeyInput(getSignedIn)
+            //floDapps.setMidStartup(load_overview_data) 
 
             //document.getElementById('subadmin-form-submit-button').addEventListener("click", submit_customer_form)
 
@@ -906,10 +530,12 @@
                 // Show userinfo 
                 document.getElementById('userinfo-nav').classList.remove('hide')
                 document.getElementById('userinfo-nav').click()
-                update_user_ui_data()
 
                 //App functions....
-                fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data')
+                fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data',{
+                    headers: {
+                        'Access-Control-Allow-Origin': '*'
+                    }})
                     .then(response => response.json())
                     .then(data => {
                         p1 = updateIdElement("total-amount-issued", data["productionValuation"])
@@ -919,9 +545,8 @@
                         p6 = updateIdElement("system-valuation", data["systemValuation"])
 
                         Promise.all([p1, p2, p3, p5, p6]).then((values) => {
-                            console.log("Updates latest values");
+                            console.log("Updated latest values");
                         });
-
 
                     })
                     .catch(error => console.error('Error:', error)) 
