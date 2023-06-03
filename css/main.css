@@ -37,9 +37,9 @@ body[data-theme=dark] * {
 }
 
 p {
-  font-size: 0.8;
+  font-size: 0.9rem;
   max-width: 65ch;
-  line-height: 1.7;
+  line-height: 1.5;
   color: rgba(var(--text-color), 0.8);
 }
 
@@ -427,12 +427,33 @@ main {
   font-weight: 500;
 }
 
+#banner {
+  padding: 1.5rem;
+  background-color: rgba(var(--text-color), 0.06);
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+table {
+  max-width: 38rem;
+}
+
+tr:nth-of-type(2n + 1) {
+  background: rgba(var(--text-color), 0.06);
+}
 tr td {
-  padding: 0.5rem 0;
+  padding: 0.8rem;
   text-align: center;
 }
 tr td:first-of-type {
   text-align: left;
+}
+tr td:last-of-type {
+  text-align: right;
+}
+
+.stat-value {
+  font-weight: 700;
 }
 
 @media screen and (max-width: 640px) {

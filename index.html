@@ -271,18 +271,17 @@
         </nav>
         <article class="right language-html">
             <section id="dashboard" class="page">
-                <h1 class="page__title">Tokenroom Economic system</h1>
-                <div class="grid gap-0-5">
-                    <div>
-                        <p>Target: Consumption Valuation should be higher than Production valuation</p>
-                        <p>Amount to go till Consumption Valuation catches up with production Valuation</p>
-                    </div>
-                    <div id="amount-left-production-consumption-catchup">
+                <div class="grid gap-0-5" id="banner">
+                    <strong> Target </strong>
+                    <p>Consumption Valuation should be higher than Production valuation.
+                        Amount to go till Consumption Valuation catches up with production Valuation
+                    </p>
+                    <b id="amount-left-production-consumption-catchup">
                         <sm-spinner></sm-spinner>
-                    </div>
+                    </b>
                 </div>
                 <br>
-                <div class="card-wrapper">
+                <!-- <div class="card-wrapper">
                     <div class="card">
                         <h3>Expenses</h3>
                         <p id="total-amount-issued">
@@ -302,13 +301,13 @@
                         </p>
                     </div>
                     <div class="card">
-                        <h3>Revenue (Booked + stayed)</h3>
+                        <h3>Gross Revenue (Booked + stayed)</h3>
                         <p id="total-consumption-cost">
                             <sm-spinner></sm-spinner>
                         </p>
                     </div>
                     <div class="card">
-                        <h3>Consumption valuation</h3>
+                        <h3>Revenue from stays</h3>
                         <p id="consumption-valuation">
                             <sm-spinner></sm-spinner>
                         </p>
@@ -319,7 +318,90 @@
                             <sm-spinner></sm-spinner>
                         </p>
                     </div>
-                </div>
+                </div> -->
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Expenses
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="total-amount-issued" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Price per room night
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="price-per-unit-consumption" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Total room nights stayed
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="total-consumption-measured" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Gross Revenue (Booked + stayed)
+                                    Total room nights stayed
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="total-consumption-cost" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Revenue from stays
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="consumption-valuation" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    System Valuation
+                                </h4>
+                                <p>
+                                    Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                            </td>
+                            <td id="system-valuation" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
 
             <section id="userinfo" class="page hide">
