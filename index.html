@@ -273,7 +273,10 @@
         <article class="right language-html">
             <section id="dashboard" class="page">
                 <h1 class="page__title">Tokenroom Economic system</h1>
-                <p>Details of various parts of Tokenroom's Economic system</p>
+                <p>Target: Consumption Valuation should be higher than Production valuation</p>
+                <p>Amount to go till Consumption Valuation catches up with production Valuation</p>
+                <div id="amount-left-production-consumption-catchup"></div>
+                <br>
                 <div class="card-wrapper">
                     <div class="card">
                         <h3>Production valuation</h3>
@@ -544,8 +547,9 @@
                         p3 = updateIdElement("total-consumption-cost", data["consumptionCost"])
                         p5 = updateIdElement("consumption-valuation", data["consumptionValuation"])
                         p6 = updateIdElement("system-valuation", data["systemValuation"])
+                        p7 = updateIdElement("amount-left-production-consumption-catchup", data["systemValuation"])
 
-                        Promise.all([p1, p2, p3, p5, p6]).then((values) => {
+                        Promise.all([p1, p2, p3, p5, p6, p7]).then((values) => {
                             console.log("Updated latest values");
                         });
 
