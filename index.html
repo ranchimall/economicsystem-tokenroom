@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Roboto+Mono&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Roboto+Mono&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet" />
 
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
@@ -23,10 +25,6 @@
 
 <body data-theme="light" class="hide" onload="onLoadStartUp()">
     <sm-notifications id="notification_drawer"></sm-notifications>
-    <audio id="notification_sound">
-        <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg" />
-        <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg" />
-    </audio>
     <sm-popup id="confirmation_popup">
         <h4 id="confirm_title"></h4>
         <p id="confirm_message"></p>
@@ -122,7 +120,8 @@
                 <div class="grid">
                     <h5>Reset App Data?</h5>
                 </div>
-                <sm-button id='clearLocalData_button' class="danger cta justify-self-start" onclick="clearLocalData()">Reset Data
+                <sm-button id='clearLocalData_button' class="danger cta justify-self-start"
+                    onclick="clearLocalData()">Reset Data
                 </sm-button>
                 <div class="grid">
                     <h5>My FLO ID</h5>
@@ -273,34 +272,52 @@
         <article class="right language-html">
             <section id="dashboard" class="page">
                 <h1 class="page__title">Tokenroom Economic system</h1>
-                <p>Target: Consumption Valuation should be higher than Production valuation</p>
-                <p>Amount to go till Consumption Valuation catches up with production Valuation</p>
-                <div id="amount-left-production-consumption-catchup"></div>
+                <div class="grid gap-0-5">
+                    <div>
+                        <p>Target: Consumption Valuation should be higher than Production valuation</p>
+                        <p>Amount to go till Consumption Valuation catches up with production Valuation</p>
+                    </div>
+                    <div id="amount-left-production-consumption-catchup">
+                        <sm-spinner></sm-spinner>
+                    </div>
+                </div>
                 <br>
                 <div class="card-wrapper">
                     <div class="card">
-                        <h3>Production valuation</h3>
-                        <p id="total-amount-issued">-</p>
+                        <h3>Expenses</h3>
+                        <p id="total-amount-issued">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                     <div class="card">
                         <h3>Price per room night </h3>
-                        <p id="price-per-unit-consumption">30</p>
+                        <p id="price-per-unit-consumption">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                     <div class="card">
-                        <h3>Total units of consumption measured</h3>
-                        <p id="total-consumption-measured">-</p>
+                        <h3>Total room nights stayed</h3>
+                        <p id="total-consumption-measured">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                     <div class="card">
-                        <h3>Consumption amount USD</h3>
-                        <p id="total-consumption-cost">-</p>
+                        <h3>Revenue (Booked + stayed)</h3>
+                        <p id="total-consumption-cost">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                     <div class="card">
                         <h3>Consumption valuation</h3>
-                        <p id="consumption-valuation">-</p>
+                        <p id="consumption-valuation">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                     <div class="card">
                         <h3>System Valuation</h3>
-                        <p id="system-valuation">-</p>
+                        <p id="system-valuation">
+                            <sm-spinner></sm-spinner>
+                        </p>
                     </div>
                 </div>
             </section>
@@ -326,7 +343,7 @@
                 <div class="card-wrapper">
                     <div class="card">
                         <h3>My Token Valuation</h3>
-                        <p id="total-flobnb-valuation">-</p>
+                        <p id="total-flobnb-valuation"></p>
                     </div>
                     <div class="card">
                         <h3>My Total MINING</h3>
@@ -405,7 +422,7 @@
     </template>
     <template id="miner_status_entry">
         <tr class='miner-status-entry'>
-            <td class="miner-status-entry-floid"></td> 
+            <td class="miner-status-entry-floid"></td>
             <td class="tokens-to-release"></td>
             <td class="old-tokens"></td>
             <td class="new-tokens"></td>
@@ -497,24 +514,46 @@
     </script>
 
     <script id="onLoadStartUp">
-
-        async function updateIdElement(elementId, value){
-            element = document.getElementById(elementId)
-            element.innerText = value
-
+        function formatAmount(amount) {
+            console.log(amount)
+            return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
         }
-
         async function onLoadStartUp() {
             //floDapps.addStartUpFunction('Sample', Promised Function)
             //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
-            //floDapps.setCustomPrivKeyInput( () => { FUNCTION BODY *must resolve private key* } )
+            floDapps.setCustomPrivKeyInput(() => new Promise(() => { }))
 
             //floDapps.setAppObjectStores({ images: {} })
             //floDapps.setCustomPrivKeyInput(getSignedIn)
             //floDapps.setMidStartup(load_overview_data) 
 
             //document.getElementById('subadmin-form-submit-button').addEventListener("click", submit_customer_form)
-
+            floDapps.setMidStartup(() => {
+                return new Promise((resolve, reject) => {
+                    console.log('before fetch')
+                    fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data', {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const { productionValuation, consumptionNumber, consumptionCost, consumptionValuation, systemValuation } = data
+                            getRef("total-amount-issued").textContent = formatAmount(productionValuation)
+                            getRef("price-per-unit-consumption").textContent = formatAmount(consumptionValuation / consumptionNumber)
+                            getRef("total-consumption-measured").textContent = consumptionNumber
+                            getRef("total-consumption-cost").textContent = formatAmount(consumptionCost)
+                            getRef("consumption-valuation").textContent = formatAmount(consumptionValuation)
+                            getRef("system-valuation").textContent = formatAmount(systemValuation)
+                            getRef("amount-left-production-consumption-catchup").textContent = formatAmount(Math.max(0, (productionValuation - consumptionValuation)))
+                            resolve()
+                        })
+                        .catch(error => {
+                            console.error('Error:', error)
+                            reject(error)
+                        })
+                })
+            })
             floDapps.launchStartUp().then((result) => {
                 console.log(result);
                 //window.location.hash = '#userinfo';
@@ -528,33 +567,12 @@
                     console.log('This is a subadmin')
                     document.getElementById('subadmin-nav').classList.remove('hide')
                 }
-                
+
                 // Show userinfo 
                 //document.getElementById('userinfo-nav').classList.remove('hide')
                 //document.getElementById('userinfo-nav').click()
 
                 //App functions....
-                console.log('before fetch')
-                fetch('https://esapi-tokenroom.ranchimall.net/api/economicSystem/data',{
-                    headers: {
-                        'Access-Control-Allow-Origin': '*'
-                    }})
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('after fetch')
-                        p1 = updateIdElement("total-amount-issued", data["productionValuation"])
-                        p2 = updateIdElement("total-consumption-measured", data["consumptionNumber"])
-                        p3 = updateIdElement("total-consumption-cost", data["consumptionCost"])
-                        p5 = updateIdElement("consumption-valuation", data["consumptionValuation"])
-                        p6 = updateIdElement("system-valuation", data["systemValuation"])
-                        p7 = updateIdElement("amount-left-production-consumption-catchup", data["systemValuation"])
-
-                        Promise.all([p1, p2, p3, p5, p6, p7]).then((values) => {
-                            console.log("Updated latest values");
-                        });
-
-                    })
-                    .catch(error => console.error('Error:', error)) 
 
             }).catch((error) => console.error(error));
         }

@@ -9,7 +9,8 @@
   font-size: clamp(1rem, 1.2vmax, 3rem);
 }
 
-html, body {
+html,
+body {
   height: 100%;
   scroll-behavior: smooth;
 }
@@ -20,7 +21,7 @@ body {
 }
 body,
 body * {
-  --accent-color: #0D7377;
+  --accent-color: #0d7377;
   --text-color: 17, 17, 17;
   --background-color: 255, 255, 255;
   --danger-color: red;
@@ -28,7 +29,7 @@ body * {
 
 body[data-theme=dark],
 body[data-theme=dark] * {
-  --accent-color: #32E0C4;
+  --accent-color: #32e0c4;
   --text-color: 240, 240, 240;
   --text-color-light: 170, 170, 170;
   --background-color: 10, 10, 10;
@@ -39,11 +40,7 @@ p {
   font-size: 0.8;
   max-width: 65ch;
   line-height: 1.7;
-  margin-bottom: 1.5rem;
   color: rgba(var(--text-color), 0.8);
-}
-p:not(:last-of-type) {
-  margin-bottom: 1rem;
 }
 
 img {
@@ -79,6 +76,10 @@ a:any-link:focus-visible {
 
 sm-button {
   --border-radius: 0.3rem;
+}
+
+sm-spinner {
+  --size: 1rem;
 }
 
 ul {
@@ -317,7 +318,10 @@ ul {
   margin-left: auto;
 }
 
-h1, h2, h3, h4.h5 {
+h1,
+h2,
+h3,
+h4.h5 {
   font-family: "Poppins", sans-serif;
 }
 
@@ -497,4 +501,3 @@ tr td:first-of-type {
     cursor: pointer;
   }
 }
-/*# sourceMappingURL=main.css.map */
