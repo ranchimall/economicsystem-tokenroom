@@ -271,7 +271,7 @@
         </nav>
         <article class="right language-html">
             <section id="dashboard" class="page">
-                <h2>Formulas</h2>
+                <h2>Get Started</h2>
                 <table>
                     <tbody>
                         <tr>
@@ -421,6 +421,16 @@
                     <b id="amount-left-production-consumption-catchup">
                         <sm-spinner></sm-spinner>
                     </b>
+                    <p>Initial token sales should cover up for the production cost at the time of sale
+                    </p>
+                    <b id="amount-left-production-consumption-catchup">
+                        <sm-spinner></sm-spinner>
+                    </b>
+                    <p>Consumption of the service should take care of the running costs 
+                    </p>
+                    <b id="amount-left-production-consumption-catchup">
+                        <sm-spinner></sm-spinner>
+                    </b>
                 </div>
                 <br>
                 <table>
@@ -477,7 +487,7 @@
                                     Investment(committed + delivered) and room revenues (Booked + stayed)
                                 </h4>
                                 <p>
-                                    The total money we have received from token sales, pre room bookings and bookings
+                                    The total money we have either received or got committment for from token sales, room night investments and on the spot bookings
                                 </p>
                             </td>
                             <td id="total-consumption-cost" class="stat-value">
@@ -487,7 +497,7 @@
                         <tr>
                             <td>
                                 <h4>
-                                    Revenue from stays
+                                    Revenue from stays ( Consumption valuation)
                                 </h4>
                                 <p>
                                     Revenue collected from people staying at the tokenroom
@@ -507,6 +517,19 @@
                                 </p>
                             </td>
                             <td id="system-valuation" class="stat-value">
+                                <sm-spinner></sm-spinner>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Market Valuation
+                                </h4>
+                                <p>
+                                    Market valuation represents the future consumption valuation of the system
+                                </p>
+                            </td>
+                            <td id="market-valuation" class="stat-value">
                                 <sm-spinner></sm-spinner>
                             </td>
                         </tr>
@@ -739,6 +762,7 @@
                         getRef("total-consumption-cost").textContent = formatAmount(consumptionCost)
                         getRef("consumption-valuation").textContent = formatAmount(consumptionValuation)
                         getRef("system-valuation").textContent = formatAmount(systemValuation)
+                        getRef("market-valuation").textContent = formatAmount(-1)
                         getRef("amount-left-production-consumption-catchup").textContent = formatAmount(Math.max(0, (productionValuation - consumptionValuation)))
                         resolve()
                     })
