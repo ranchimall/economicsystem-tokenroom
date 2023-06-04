@@ -271,6 +271,148 @@
         </nav>
         <article class="right language-html">
             <section id="dashboard" class="page">
+                <h2>Formulas</h2>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Production Valuation
+                                </h4>
+                                <p>
+                                    Add up all expenses
+                                </p>
+                                <p>
+                                    Production valuation is the sum of all the expenses incurred to operate the system. When tokens are sold the valuation should be atleast equal to cost of operating the system.
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Consumption Valuation
+                                </h4>
+                                <p>
+                                    Number of room nights consumed * Consumption valuation per night
+                                </p>
+                                <p>
+                                    Consumption valuation is the result of valuation the system is building on account of the basic good or service being offered for consumption. This represents the gains and earnings from the operation of system.
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Ownership token
+                                </h4>
+                                <p>
+                                    Ownership tokens own the profits of the system
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Market valuation
+                                </h4>
+                                <p>
+                                    Market valuation = Number of ownership token * price per ownership token
+                                </p>
+                                <p>
+                                    Market valuation is the future consumption valuation
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    System Valuation
+                                </h4>
+                                <p>
+                                    System Valuation = Higher of production valuation and consumption valuation
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Reserve Pool
+                                </h4>
+                                <p>
+                                    Reserve Pool = Market valuation - Production valuation
+                                </p>
+                                <p>
+                                    Reserve Pool is a Bitcoin Multisig address which acts as the bank account for this system. All payments and expenses related to the system will happen there. 
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h4>
+                                    Investments
+                                </h4>
+                                <p>
+                                     
+                                </p>
+                                <p>
+                                    Investments help in providing for the initial production valuation and they add to the reserve pool.
+                                </p>
+                            </td>
+                            <td class="stat-value">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <div class="grid gap-0-5" id="banner">
+                    <strong> Item being consumed </strong>
+                    <p>
+                        Room nights
+                    </p>
+                </div>
+                <br>
+                <div class="grid gap-0-5" id="banner">
+                    <strong> Reserve tokens </strong>
+                    <p>
+                        Tokens and currency used to keep the system running
+                    </p>
+                    <b id="reserve-tokens-amount">
+                        <sm-spinner></sm-spinner>
+                    </b>
+                </div>
+                <br>
+                <div class="grid gap-0-5" id="banner">
+                    <strong> Ownership token </strong>
+                    <p>
+                        Tokenroom#
+                    </p>
+                    <b id="ownership-tokens-amount">
+                        <sm-spinner></sm-spinner>
+                    </b>
+                </div>
+                <br>
+                <div class="grid gap-0-5" id="banner">
+                    <strong> Price per ownership token </strong>
+                    <p>
+                        
+                    </p>
+                    <b id="amount-left-production-consumption-catchu">
+                        <sm-spinner></sm-spinner>
+                    </b>
+                </div>
+                <br>
                 <div class="grid gap-0-5" id="banner">
                     <strong> Target </strong>
                     <p>Consumption Valuation should be higher than Production valuation.
@@ -286,10 +428,13 @@
                         <tr>
                             <td>
                                 <h4>
-                                    Expenses
+                                    Expenses ( Production valuation)
                                 </h4>
                                 <p>
                                     Includes rent of the property, maintenance, staff salaries, etc.
+                                </p>
+                                <p>
+                                    Valuation of all tokens initially is at least equal to the cost incurred.
                                 </p>
                             </td>
                             <td id="total-amount-issued" class="stat-value">
@@ -299,10 +444,14 @@
                         <tr>
                             <td>
                                 <h4>
-                                    Price per room night
+                                    Consumption valuation per room night ( Unit of consumption valuation)
                                 </h4>
                                 <p>
-                                    The valuation price per room night 
+                                    The consumption valuation price per room night used to calculate how much system
+                                    valuation is being derived from consum
+                                </p>
+                                <p>
+                                    Contribution to
                                 </p>
                             </td>
                             <td id="price-per-unit-consumption" class="stat-value">
@@ -325,7 +474,7 @@
                         <tr>
                             <td>
                                 <h4>
-                                    Gross Revenue (Booked + stayed)
+                                    Investment(committed + delivered) and room revenues (Booked + stayed)
                                 </h4>
                                 <p>
                                     The total money we have received from token sales, pre room bookings and bookings
@@ -363,6 +512,8 @@
                         </tr>
                     </tbody>
                 </table>
+                <br>
+
             </section>
 
             <section id="userinfo" class="page hide">
@@ -579,46 +730,52 @@
                             'Access-Control-Allow-Origin': '*'
                         }
                     })
-                        .then(response => response.json())
-                        .then(data => {
-                            const { productionValuation, consumptionNumber, consumptionCost, consumptionValuation, systemValuation } = data
-                            getRef("total-amount-issued").textContent = formatAmount(productionValuation)
-                            getRef("price-per-unit-consumption").textContent = formatAmount(consumptionValuation / consumptionNumber)
-                            getRef("total-consumption-measured").textContent = consumptionNumber
-                            getRef("total-consumption-cost").textContent = formatAmount(consumptionCost)
-                            getRef("consumption-valuation").textContent = formatAmount(consumptionValuation)
-                            getRef("system-valuation").textContent = formatAmount(systemValuation)
-                            getRef("amount-left-production-consumption-catchup").textContent = formatAmount(Math.max(0, (productionValuation - consumptionValuation)))
-                            resolve()
-                        })
-                        .catch(error => {
-                            console.error('Error:', error)
-                            reject(error)
-                        })
+                    .then(response => response.json())
+                    .then(data => {
+                        const { productionValuation, consumptionNumber, consumptionCost, consumptionValuation, systemValuation } = data
+                        getRef("total-amount-issued").textContent = formatAmount(productionValuation)
+                        getRef("price-per-unit-consumption").textContent = formatAmount(consumptionValuation / consumptionNumber)
+                        getRef("total-consumption-measured").textContent = consumptionNumber
+                        getRef("total-consumption-cost").textContent = formatAmount(consumptionCost)
+                        getRef("consumption-valuation").textContent = formatAmount(consumptionValuation)
+                        getRef("system-valuation").textContent = formatAmount(systemValuation)
+                        getRef("amount-left-production-consumption-catchup").textContent = formatAmount(Math.max(0, (productionValuation - consumptionValuation)))
+                        resolve()
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                        reject(error)
+                    })
+
+
+                    btcOperator.getBalance('bc1qh38s56q6vqahqv758dgsrvh92tkrt5drg259zklqectmj44uy5lsg4ppps')
+                    .then((btcAddresBalance) => {
+                        getRef("reserve-tokens-amount").textContent = `${btcAddresBalance} BTC`
+                    })
                 })
             })
-            floDapps.launchStartUp().then((result) => {
-                console.log(result);
-                //window.location.hash = '#userinfo';
-                // getRef('user_flo_id').value = myFloID
-                // getRef('user_login_popup_button').classList.add('hide')
-                // getRef('userpage-userfloid').innerText = myFloID
-                // getRef('user_signout_popup_button').classList.remove('hide')
+                floDapps.launchStartUp().then((result) => {
+                    console.log(result);
+                    //window.location.hash = '#userinfo';
+                    // getRef('user_flo_id').value = myFloID
+                    // getRef('user_login_popup_button').classList.add('hide')
+                    // getRef('userpage-userfloid').innerText = myFloID
+                    // getRef('user_signout_popup_button').classList.remove('hide')
 
-                // Check if subadmin 
-                if (floGlobals.subAdmins.includes(myFloID)) {
-                    console.log('This is a subadmin')
-                    document.getElementById('subadmin-nav').classList.remove('hide')
-                }
+                    // Check if subadmin 
+                    if (floGlobals.subAdmins.includes(myFloID)) {
+                        console.log('This is a subadmin')
+                        document.getElementById('subadmin-nav').classList.remove('hide')
+                    }
 
-                // Show userinfo 
-                //document.getElementById('userinfo-nav').classList.remove('hide')
-                //document.getElementById('userinfo-nav').click()
+                    // Show userinfo 
+                    //document.getElementById('userinfo-nav').classList.remove('hide')
+                    //document.getElementById('userinfo-nav').click()
 
-                //App functions....
+                    //App functions....
 
-            }).catch((error) => console.error(error));
-        }
+                }).catch((error) => console.error(error));
+            }
     </script>
 
     <script src="https://ranchimall.github.io/Standard_Operations/lib.js"></script>
@@ -627,6 +784,7 @@
     <script src="https://ranchimall.github.io/Standard_Operations/compactIDB.js"></script>
     <script src="https://ranchimall.github.io/Standard_Operations/floCloudAPI.js"></script>
     <script src="https://ranchimall.github.io/Standard_Operations/floDapps.js"></script>
+    <script src="https://ranchimall.github.io/Standard_Operations/btcOperator.js"></script>
 
 </body>
 
