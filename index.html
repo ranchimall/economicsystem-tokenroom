@@ -18,9 +18,9 @@
             blockchain: "FLO",
             adminID: "FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf",
             application: "TEST_MODE",
+            token_api: "https://ranchimallflo.ranchimall.net"
         }
     </script>
-
 </head>
 
 <body data-theme="light" class="hide" onload="onLoadStartUp()">
@@ -408,7 +408,7 @@
                     <p>
                         
                     </p>
-                    <b id="amount-left-production-consumption-catchu">
+                    <b id="price-per-ownership-token">
                         <sm-spinner></sm-spinner>
                     </b>
                 </div>
@@ -757,6 +757,7 @@
                         const { productionValuation, consumptionNumber, consumptionCost, consumptionValuation, systemValuation } = data
                         getRef("total-amount-issued").textContent = formatAmount(productionValuation)
                         getRef("price-per-unit-consumption").textContent = formatAmount(consumptionValuation / consumptionNumber)
+                        getRef("price-per-ownership-token").textContent = formatAmount(consumptionValuation / consumptionNumber)
                         getRef("total-consumption-measured").textContent = consumptionNumber
                         getRef("total-consumption-cost").textContent = formatAmount(consumptionCost)
                         getRef("consumption-valuation").textContent = formatAmount(consumptionValuation)
@@ -769,10 +770,28 @@
                         console.error('Error:', error)
                         reject(error)
                     })
+                    
+
+                    fetch(`${floGlobals.token_api}/api/v2/tokenInfo/tokenroom`, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const { token, tokenSupply} = data
+                        getRef("ownership-tokens-amount").textContent = tokenSupply
+                        resolve()
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                        reject(error)
+                    })
 
 
                     btcOperator.getBalance('bc1qh38s56q6vqahqv758dgsrvh92tkrt5drg259zklqectmj44uy5lsg4ppps')
                     .then((btcAddresBalance) => {
+                        console.log(`BTC balance ${btcAddresBalance}`)
                         getRef("reserve-tokens-amount").textContent = `${btcAddresBalance} BTC`
                     })
                 })
@@ -799,6 +818,8 @@
 
                 }).catch((error) => console.error(error));
             }
+
+            
     </script>
 
     <script src="https://ranchimall.github.io/Standard_Operations/lib.js"></script>
